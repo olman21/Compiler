@@ -1,0 +1,10 @@
+Mopi.Compiler/bin
+Mopi.Compiler/obj
+Mopi.Compiler/Packages
+Symbols/bin
+Symbols/obj
+Symbols/Packages
+LexicalAnalizer/bin
+LexicalAnalizer/obj
+LexicalAnalizer/Packages
+
