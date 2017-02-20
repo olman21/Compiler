@@ -24,7 +24,14 @@ namespace Symbols
 
         public Symbol GetToken(string token)
         {
-            return SymbolsTable[token];
+            Symbol FoundToken;
+            if(SymbolsTable.TryGetValue(token, out FoundToken))
+                return FoundToken;
+            return null;
+        }
+
+        public IEnumerable<Symbol> GetSymbols() {
+            return SymbolsTable.Where(s => s.Value.IsCustom).Select(s=>s.Value);
         }
 
         public bool TokenExists(string token)
@@ -34,16 +41,13 @@ namespace Symbols
 
         public void SetToken(Symbol NewSymbol)
         {
-            SymbolsTable.Add(NewSymbol.Key,NewSymbol);
+            SymbolsTable.Add(NewSymbol.Id,NewSymbol);
         }
 
         public IEnumerable<Symbol> GetSymbolsByType(TokenType type) 
         {
             return this.SymbolsTable.Where(s => s.Value != null ? s.Value.type == type : false)
-                        .Select(s=> {
-                            s.Value.Key = s.Key;
-                            return s.Value;
-                        });
+                        .Select(s=> s.Value);
         }
 
         public Symbol GetDelimiter()

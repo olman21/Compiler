@@ -8,6 +8,7 @@ namespace Symbols.Models
 {
     public enum TokenType
     {
+        none,
         primitive,
         arithmetic,
         assigment,
@@ -15,6 +16,8 @@ namespace Symbols.Models
         logic,
         conditional,
         loop,
-        delimiter
+        delimiter,
+        identifier,
+        value
     }
 }

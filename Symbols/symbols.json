@@ -1,14 +1,16 @@
 {
   "int": {
+    "Id": "int",
     "description": "Signed Integer",
     "type": "primitive",
     "bitInterval": {
       "min": "-2147483648",
       "max": "2147483647"
     },
-    "regex": "int\\s+(?!\\d)[a-zA-Z_0-9]{1,50}(\\s*=\\s*\\d\\s*)?;"
+    "regex": "int\\s+((?!\\d)[a-zA-Z_0-9]{1,50})(\\s*=\\s*\\d\\s*)?;"
   },
   "char": {
+    "Id": "char",
     "description": "Character alphanumeric",
     "type": "primitive",
     "bitInterval": {
@@ -18,107 +20,128 @@
     "regex": ""
   },
   "text": {
+    "Id": "text",
     "description": "Characters string",
     "type": "primitive",
     "regex": ""
   },
   "bool": {
+    "Id": "bool",
     "description": "Boolean",
     "type": "primitive",
     "values": [ "true", "false", "0", "1" ],
     "regex": ""
   },
   "date": {
+    "Id": "date",
     "description": "date and time",
     "type": "primitive",
     "regex": ""
   },
   "*": {
+    "Id": "*",
     "description": "multiplication",
     "type": "arithmetic",
     "regex": "\\d+\\s*\\*\\s*\\d+"
   },
   "/": {
+    "Id": "/",
     "description": "division",
     "type": "arithmetic",
     "regex": "\\d+\\s*/\\s*\\d+"
   },
   "%": {
+    "Id": "%",
     "description": "Module",
     "type": "arithmetic",
     "regex": "\\d+\\s*%\\s*\\d+"
   },
   "+": {
+    "Id": "+",
     "description": "Addition",
     "type": "arithmetic",
     "regex": "\\d+\\s*\\+\\s*\\d+"
   },
   "-": {
+    "Id": "-",
     "description": "Substraction",
     "type": "arithmetic",
     "regex": "\\d+\\s*-\\s*\\d+"
   },
   "=": {
+    "Id": "=",
     "description": "Assigment",
     "type": "assigment",
     "regex": ""
   },
   "+=": {
+    "Id": "+=",
     "description": "Increment",
     "type": "assigment",
     "regex": ""
   },
   "-=": {
+    "Id": "-=",
     "description": "Decrement",
     "type": "assigment",
     "regex": ""
   },
   "*=": {
+    "Id": "*=",
     "description": "Multiplication",
     "type": "assigment",
     "regex": ""
   },
   "equals": {
+    "Id": "equals",
     "description": "Equality",
     "type": "comparation",
     "regex": ""
   },
   "not=": {
+    "Id": "not=",
     "description": "Non Equality",
     "type": "comparation",
     "regex": ""
   },
   "&&": {
+    "Id": "&&",
     "description": "And",
     "type": "logic",
     "regex": ""
   },
   "|": {
+    "Id": "|",
     "description": "Or",
     "type": "logic",
     "regex": ""
   },
   "if": {
+    "Id": "if",
     "description": "flow",
     "type": "conditional",
     "regex": ""
   },
   "for": {
+    "Id": "for",
     "description": "Cicle with counter",
     "type": "loop",
     "regex": ""
   },
   "while": {
+    "Id": "while",
     "description": "conditional Cicle",
     "type": "loop",
     "regex": ""
   },
   "do": {
+    "Id": "do",
     "description": "conditional Cicle executes before evaluate",
     "type": "loop",
     "regex": ""
   },
   ";": {
+    "Id": ";",
     "description": "Delimiter",
     "type": "delimiter"
   }

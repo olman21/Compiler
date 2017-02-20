@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LexicalAnalizer;
+using Newtonsoft.Json;
 
 namespace Mopi.Compiler
 {
@@ -11,7 +13,14 @@ namespace Mopi.Compiler
     {
         static void Main(string[] args)
         {
-            SymbolHelper helper = new SymbolHelper();
+            Analizer helper = new Analizer();
+            helper.LoadSourceCode(@"C:\Olman\UAM\Modelos de programacion\sourceSample.mopi");
+            var addedSymbols = helper.GetAddedSymbols();
+            string output = JsonConvert.SerializeObject(addedSymbols);
+
+            Console.Write(output);
+            Console.ReadLine();
+
         }
     }
 }

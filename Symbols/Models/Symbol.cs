@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,11 +12,20 @@ namespace Symbols.Models
     {
         private Regex _pattern;
         public TokenType type { get; set; }
+        public string typeName
+        {
+            get
+            {
+                return type.ToString();
+            }
+        }
         public string name { get; set; }
         public string Id { get; set; }
         public string description { get; set; }
         public BitRange bitInterval { get; set; }
+        [JsonIgnore]
         public string regex { get; set; }
+        [JsonIgnore]
         public Regex Pattern
         {
             get
@@ -30,6 +40,9 @@ namespace Symbols.Models
             }
         }
 
+        public bool IsCustom { get; set; }
+        public Symbol DataType { get; set; }
+        public string Value { get; set; }
     }
 
     public struct BitRange
