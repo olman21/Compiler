@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Analizer.cs" />
     <Compile Include="Models\CodeLine.cs" />
+    <Compile Include="Models\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

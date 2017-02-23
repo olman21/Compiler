@@ -15,7 +15,7 @@ namespace Mopi.Compiler
         {
             Analizer helper = new Analizer();
             helper.LoadSourceCode(@"C:\Olman\UAM\Modelos de programacion\sourceSample.mopi");
-            var addedSymbols = helper.GetAddedSymbols();
+            var addedSymbols = helper.GetAddedErrors();
             string output = JsonConvert.SerializeObject(addedSymbols);
 
             Console.Write(output);

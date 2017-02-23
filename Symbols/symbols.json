@@ -7,7 +7,17 @@
       "min": "-2147483648",
       "max": "2147483647"
     },
-    "regex": "int\\s+((?!\\d)[a-zA-Z_0-9]{1,50})(\\s*=\\s*\\d\\s*)?;"
+    "regex": "int\\s+(?<identifier>(?!\\d)[a-zA-Z_0-9]{1,50})(\\s*=\\s*(?<value>(?<sign>-?)\\d{1,15}))?\\s*(?<delimiter>;)"
+  },
+  "number": {
+    "Id": "number",
+    "description": "Signed float number",
+    "type": "primitive",
+    "bitInterval": {
+      "min": "-2147483648",
+      "max": "2147483647"
+    },
+    "regex": "number\\s+(?<identifier>(?!\\d)[a-zA-Z_0-9]{1,50})(\\s*=\\s*(?<value>(-?)\\d{1,15}(\\.\\d{1,15})?))?\\s*(?<delimiter>;)"
   },
   "char": {
     "Id": "char",
@@ -42,31 +52,36 @@
     "Id": "*",
     "description": "multiplication",
     "type": "arithmetic",
-    "regex": "\\d+\\s*\\*\\s*\\d+"
+    "regex": "\\d+\\s*\\*\\s*\\d+",
+    "weight": "0"
   },
   "/": {
     "Id": "/",
     "description": "division",
     "type": "arithmetic",
-    "regex": "\\d+\\s*/\\s*\\d+"
+    "regex": "\\d+\\s*/\\s*\\d+",
+    "weight": "1"
   },
   "%": {
     "Id": "%",
     "description": "Module",
     "type": "arithmetic",
-    "regex": "\\d+\\s*%\\s*\\d+"
+    "regex": "\\d+\\s*%\\s*\\d+",
+    "weight": "3"
   },
   "+": {
     "Id": "+",
     "description": "Addition",
     "type": "arithmetic",
-    "regex": "\\d+\\s*\\+\\s*\\d+"
+    "regex": "\\d+\\s*\\+\\s*\\d+",
+    "weight": "4"
   },
   "-": {
     "Id": "-",
     "description": "Substraction",
     "type": "arithmetic",
-    "regex": "\\d+\\s*-\\s*\\d+"
+    "regex": "\\d+\\s*-\\s*\\d+",
+    "weight": "5"
   },
   "=": {
     "Id": "=",

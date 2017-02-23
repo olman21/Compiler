@@ -11,6 +11,13 @@ namespace Symbols.Models
         public int Line { get; set; }
         public string Type { get; set; }
         public AnalizerType Analizer { get; set; }
+        public string AnalizerName
+        {
+            get
+            {
+                return Analizer.ToString();
+            }
+        }
         public string Message { get; set; }
     }
 }

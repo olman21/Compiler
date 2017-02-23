@@ -35,9 +35,10 @@ namespace LexicalAnalizer
             Symbol CurrentToken = null;
 
             string CurrentLine = FileToAnalize.ReadLine();
+            int LineNumber = 1;
             while (CurrentLine != null)
             {
-                string[] LineStatements = CurrentLine.Split(new string[] { Delimiter.Id }, StringSplitOptions.RemoveEmptyEntries);
+                string[] LineStatements = CurrentLine.SplitAndKeepSeparators(new string[] { Delimiter.Id }).ToArray();
 
                 foreach (string Statement in LineStatements)
                 {
@@ -45,52 +46,94 @@ namespace LexicalAnalizer
                     foreach (string Word in Words)
                     {
                         Symbol ExistingToken = symbols.GetToken(Word);
-                        if (ExistingToken != null && ExistingToken.type != TokenType.identifier)
+
+                        if (ExistingToken != null)
                         {
-                            CurrentToken = ExistingToken;
-                        }
-                        else if (CurrentToken != null)
-                        {
-                            Symbol NewSymbol = null;
-                            switch (CurrentToken.type)
+                            switch (ExistingToken.type)
                             {
                                 case TokenType.primitive:
-                                    NewSymbol = new Symbol
-                                    {
-                                        Id = $"{Word}-amb0",
-                                        IsCustom = true,
-                                        name = Word,
-                                        DataType = CurrentToken,
-                                        type = TokenType.identifier
-                                    };
-                                    CurrentToken = NewSymbol;
-                                    break;
-                                case TokenType.identifier:
-
-                                    NewSymbol = new Symbol
-                                    {
-                                        Id = $"{CurrentToken.Id}_const",
-                                        Value = Word,
-                                        IsCustom = true,
-                                        type = TokenType.value
-
-                                    };
-                                    CurrentToken = null;
+                                    ProcessPrimitive(ExistingToken, Statement, LineNumber);
                                     break;
                             }
 
-                            if (NewSymbol != null)
-                                symbols.SetToken(NewSymbol);
+                            break;
                         }
+                        else
+                        {
+                            symbols.AddError(new Error {
+                                Analizer = AnalizerType.lexical,
+                                Line = LineNumber,
+                                Message = $"Unexpected Token {Word}"
+                            });
+                        }
+
                     }
                 }
 
                 CurrentLine = FileToAnalize.ReadLine();
+                LineNumber++;
             }
         }
 
-        public IEnumerable<Symbol> GetAddedSymbols() {
+        public IEnumerable<Symbol> GetAddedSymbols()
+        {
             return symbols.GetSymbols();
+        }
+
+        public IEnumerable<Error> GetAddedErrors()
+        {
+            return symbols.GetErrors();
+        }
+
+        private void ProcessPrimitive(Symbol Token, string Statement, int LineNumber)
+        {
+            var RegexMatch = Token.Pattern.Match(Statement);
+            if (!RegexMatch.Success)
+            {
+                symbols.AddError(new Error
+                {
+                    Analizer = AnalizerType.lexical,
+                    Line = LineNumber,
+                    Message = $"Invalid sintax for {Token.Id}",
+                    Type = "Sintax"
+                });
+
+                return;
+            }
+
+            var Identifier = RegexMatch.Groups[TokenType.identifier.ToString()];
+            var Value = RegexMatch.Groups[TokenType.value.ToString()];
+            if (Identifier != null)
+            {
+                symbols.SetToken(new Symbol
+                {
+                    Id = $"{Identifier.Value}-amb0",
+                    IsCustom = true,
+                    name = Identifier.Value,
+                    DataType = Token,
+                    type = TokenType.identifier
+                });
+            }
+
+            if(Value != null)
+            {
+                symbols.SetToken(new Symbol
+                {
+                    Id = $"{Identifier.Value}_const",
+                    Value = Value.Value,
+                    IsCustom = true,
+                    type = TokenType.value
+                });
+            }
+        }
+        private void ConditionalStructure()
+        {
+
+        }
+
+        private void LoopStructure()
+        {
+
         }
 
         public void Dispose()

@@ -12,13 +12,15 @@ namespace Symbols
     public class SymbolHelper
     {
         private Dictionary<string, Symbol> SymbolsTable;
-        private Dictionary<string, Error> ErrosTable;
+        private List<Error> ErrorTable;
         public SymbolHelper() {
             string BaseDirectoryPath = AppDomain.CurrentDomain.BaseDirectory;
             using (var SymbolsJson = File.OpenText($@"{BaseDirectoryPath}\symbols.json"))
             {
                 this.SymbolsTable = JsonConvert.DeserializeObject<Dictionary<string, Symbol>>(SymbolsJson.ReadToEnd());
             }
+
+            ErrorTable = new List<Error>();
                
         }
 
@@ -59,6 +61,16 @@ namespace Symbols
             Delimiter.Value.Id = Delimiter.Key;
 
             return Delimiter.Value;
+        }
+
+        public void AddError(Error error)
+        {
+            ErrorTable.Add(error);
+        }
+
+        public List<Error> GetErrors()
+        {
+            return ErrorTable;
         }
     }
 }

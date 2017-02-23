@@ -23,7 +23,6 @@ namespace Symbols.Models
         public string Id { get; set; }
         public string description { get; set; }
         public BitRange bitInterval { get; set; }
-        [JsonIgnore]
         public string regex { get; set; }
         [JsonIgnore]
         public Regex Pattern
