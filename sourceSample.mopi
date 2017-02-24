@@ -1,0 +1,7 @@
+int monto=100; 
+int margen=10;
+number precioMargen = monto * (10/100);
+
+if(monto Equals 100){ 
+
+}

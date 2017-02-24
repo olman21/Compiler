@@ -18,6 +18,8 @@ namespace Symbols.Models
         loop,
         delimiter,
         identifier,
+        OpenBlockDelimiter,
+        CloseBlockDelimiter,
         value
     }
 }

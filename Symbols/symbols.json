@@ -60,7 +60,8 @@
     "description": "division",
     "type": "arithmetic",
     "regex": "\\d+\\s*/\\s*\\d+",
-    "weight": "1"
+    "weight": "1",
+    "escaped": "/"
   },
   "%": {
     "Id": "%",
@@ -81,7 +82,8 @@
     "description": "Substraction",
     "type": "arithmetic",
     "regex": "\\d+\\s*-\\s*\\d+",
-    "weight": "5"
+    "weight": "5",
+    "escaped": "\\-"
   },
   "=": {
     "Id": "=",
@@ -135,7 +137,7 @@
     "Id": "if",
     "description": "flow",
     "type": "conditional",
-    "regex": ""
+    "regex": "if\\s*\\(\\s*(((((?!\\\\d)[a-zA-Z_0-9]{1,50}))\\s*(equals|not=)\\s*[a-zA-Z0-9.\\d]+)|(((?!\\\\d)[a-zA-Z_0-9]{1,50})))\\s*\\)\\s*\\n?\\{(\\n*.*\\n*.*)\\}"
   },
   "for": {
     "Id": "for",
@@ -159,5 +161,15 @@
     "Id": ";",
     "description": "Delimiter",
     "type": "delimiter"
+  },
+  "{": {
+    "Id": "{",
+    "description": "Open Block Delimiter",
+    "type": "OpenBlockDelimiter"
+  },
+  "}": {
+    "Id": "}",
+    "description": "Close Block Delimiter",
+    "type": "CloseBlockDelimiter"
   }
 }

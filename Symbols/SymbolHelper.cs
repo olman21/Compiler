@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
 using Symbols.Models;
+using System.Text.RegularExpressions;
 
 namespace Symbols
 {
@@ -71,6 +72,11 @@ namespace Symbols
         public List<Error> GetErrors()
         {
             return ErrorTable;
+        }
+
+        public string GetSymbolSet(TokenType type)
+        {
+            return string.Join("", GetSymbolsByType(type).Select(o => o.escaped??o.Id).ToArray());
         }
     }
 }

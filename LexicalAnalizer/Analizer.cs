@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Symbols;
 using Symbols.Models;
 using LexicalAnalizer.Models;
+using System.Text.RegularExpressions;
 
 namespace LexicalAnalizer
 {
@@ -26,16 +27,20 @@ namespace LexicalAnalizer
             Symbol Delimiter = symbols.GetDelimiter();
             var AssigmentSymbols = symbols.GetSymbolsByType(TokenType.assigment);
             List<string> AdditionalWordSpliter = new List<string> { " ", Delimiter.Id };
+            string OpenBlockDelimiter = symbols.GetSymbolSet(TokenType.OpenBlockDelimiter);
+            string CloseBlockDelimiter = symbols.GetSymbolSet(TokenType.CloseBlockDelimiter);
             if (AssigmentSymbols != null)
             {
                 AdditionalWordSpliter.AddRange(AssigmentSymbols.Select(s => s.Id).ToList());
             }
 
 
-            Symbol CurrentToken = null;
+            bool IsCodeBlock = false;
+            string BlockCode = "";
 
             string CurrentLine = FileToAnalize.ReadLine();
             int LineNumber = 1;
+            int OpenBlockCounter = 0;
             while (CurrentLine != null)
             {
                 string[] LineStatements = CurrentLine.SplitAndKeepSeparators(new string[] { Delimiter.Id }).ToArray();
@@ -45,6 +50,7 @@ namespace LexicalAnalizer
                     string[] Words = CurrentLine.Split(AdditionalWordSpliter.ToArray(), StringSplitOptions.RemoveEmptyEntries);
                     foreach (string Word in Words)
                     {
+
                         Symbol ExistingToken = symbols.GetToken(Word);
 
                         if (ExistingToken != null)
@@ -54,13 +60,18 @@ namespace LexicalAnalizer
                                 case TokenType.primitive:
                                     ProcessPrimitive(ExistingToken, Statement, LineNumber);
                                     break;
+                                case TokenType.conditional:
+                                    //Esto indica que se encuentra iterando una estructura multilinea con ambito y no es necesario seguir analizando palabra a palabra
+                                    IsCodeBlock = true;
+                                    break;
                             }
 
                             break;
                         }
                         else
                         {
-                            symbols.AddError(new Error {
+                            symbols.AddError(new Error
+                            {
                                 Analizer = AnalizerType.lexical,
                                 Line = LineNumber,
                                 Message = $"Unexpected Token {Word}"
@@ -68,8 +79,29 @@ namespace LexicalAnalizer
                         }
 
                     }
+
+
                 }
 
+                if (IsCodeBlock)
+                {
+                    var OpenBlockMatch = Regex.Match(CurrentLine, OpenBlockDelimiter);
+                    
+                    while (OpenBlockMatch.Success)
+                    {
+                        OpenBlockMatch = OpenBlockMatch.NextMatch();
+                        OpenBlockCounter++;
+                    }
+
+                    var OpenBlockMatch = Regex.Match(CurrentLine, OpenBlockDelimiter);
+
+                    while (OpenBlockMatch.Success)
+                    {
+                        OpenBlockMatch = OpenBlockMatch.NextMatch();
+                        OpenBlockCounter++;
+                    }
+                    BlockCode += CurrentLine;
+                }
                 CurrentLine = FileToAnalize.ReadLine();
                 LineNumber++;
             }
@@ -88,8 +120,25 @@ namespace LexicalAnalizer
         private void ProcessPrimitive(Symbol Token, string Statement, int LineNumber)
         {
             var RegexMatch = Token.Pattern.Match(Statement);
+            string OperatorsPattern = symbols.GetSymbolSet(TokenType.arithmetic);
+            string AssigmentPattern = symbols.GetSymbolSet(TokenType.assigment);
+
+            var ArithmeticRegex = new Regex($"[{OperatorsPattern}]");
+            var AssigmentRegex = new Regex($"[{AssigmentPattern}]");
+
             if (!RegexMatch.Success)
             {
+                //Determina si es una expresion libre de contexto
+                Match assigmentMatch = AssigmentRegex.Match(Statement);
+
+                if (assigmentMatch.Success)
+                {
+                    Match arithmetichMatch = AssigmentRegex.Match(Statement);
+                    if (arithmetichMatch.Success)
+                        return;
+                }
+
+
                 symbols.AddError(new Error
                 {
                     Analizer = AnalizerType.lexical,
@@ -115,7 +164,7 @@ namespace LexicalAnalizer
                 });
             }
 
-            if(Value != null)
+            if (Value != null)
             {
                 symbols.SetToken(new Symbol
                 {
@@ -126,7 +175,7 @@ namespace LexicalAnalizer
                 });
             }
         }
-        private void ConditionalStructure()
+        private void ConditionalStructure(Symbol Token, string Statement, int LineNumber)
         {
 
         }
