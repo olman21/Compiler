@@ -13,7 +13,7 @@ namespace Mopi.Compiler
     {
         static void Main(string[] args)
         {
-            Analizer helper = new Analizer();
+            LexicalAnalizer.Analizer helper = new LexicalAnalizer.Analizer();
             helper.LoadSourceCode(@"C:\Olman\UAM\Modelos de programacion\sourceSample.mopi");
             var addedSymbols = helper.GetAddedErrors();
             string output = JsonConvert.SerializeObject(addedSymbols);

@@ -20,6 +20,11 @@ namespace Symbols.Models
         identifier,
         OpenBlockDelimiter,
         CloseBlockDelimiter,
+        OpenGrouper,
+        CloseGrouper,
+        SingleLineComment,
+        OpenMultiLineComment,
+        ClosenMultiLineComment,
         value
     }
 }

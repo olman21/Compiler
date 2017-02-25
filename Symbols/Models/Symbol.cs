@@ -43,6 +43,8 @@ namespace Symbols.Models
         public bool IsCustom { get; set; }
         public Symbol DataType { get; set; }
         public string Value { get; set; }
+
+        public int Scope { get; set; }
     }
 
     public struct BitRange

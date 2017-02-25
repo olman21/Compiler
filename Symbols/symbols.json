@@ -137,25 +137,19 @@
     "Id": "if",
     "description": "flow",
     "type": "conditional",
-    "regex": "if\\s*\\(\\s*(((((?!\\\\d)[a-zA-Z_0-9]{1,50}))\\s*(equals|not=)\\s*[a-zA-Z0-9.\\d]+)|(((?!\\\\d)[a-zA-Z_0-9]{1,50})))\\s*\\)\\s*\\n?\\{(\\n*.*\\n*.*)\\}"
+    "regex": "if\\s*\\(\\s*(((((?!\\\\d)[a-zA-Z_0-9]{1,50}))\\s*(equals|not=)\\s*[a-zA-Z0-9.\\d]+)|(((?!\\\\d)[a-zA-Z_0-9]{1,50})))\\s*\\)\\s*\\n?\\{(?<body>(.|\\n|(|)|{|}|\\s)*)\\}"
   },
   "for": {
     "Id": "for",
     "description": "Cicle with counter",
     "type": "loop",
-    "regex": ""
+    "regex": "for\\s*\\(\\s*(int\\s+)?((?!\\\\d)[a-zA-Z_0-9]{1,50})\\s*(=\\s*\\d*)\\s*;\\s*((?!\\\\d)[a-zA-Z_0-9]{1,50})\\s*(=|>=|<=|<|>)\\s*((((?!\\\\d)[a-zA-Z_0-9]{1,50}))|\\d)\\s*;\\s*((?!\\\\d)[a-zA-Z_0-9]{1,50})(\\+\\+|--)\\s*\\)\\s*\\n?\\{((.|\\n|(|)|{|}|\\s)*)\\}"
   },
   "while": {
     "Id": "while",
     "description": "conditional Cicle",
     "type": "loop",
-    "regex": ""
-  },
-  "do": {
-    "Id": "do",
-    "description": "conditional Cicle executes before evaluate",
-    "type": "loop",
-    "regex": ""
+    "regex": "while\\s*\\(\\s*(((((?!\\\\d)[a-zA-Z_0-9]{1,50}))\\s*(equals|not=)\\s*[a-zA-Z0-9.\\d]+)|(((?!\\\\d)[a-zA-Z_0-9]{1,50})))\\s*\\)\\s*\\n?\\{((.|\\n|(|)|{|}|\\s)*)\\}"
   },
   ";": {
     "Id": ";",
@@ -171,5 +165,32 @@
     "Id": "}",
     "description": "Close Block Delimiter",
     "type": "CloseBlockDelimiter"
+  },
+  "(": {
+    "Id": "(",
+    "description": "Open Agrouper",
+    "type": "OpenGrouper"
+  },
+  ")": {
+    "Id": ")",
+    "description": "Close Agrouper",
+    "type": "CloseGrouper"
+  },
+  "--": {
+    "Id": "--",
+    "description": "Single Line Comment",
+    "type": "SingleLineComment",
+    "regex": "^--.*"
+  },
+  "-*": {
+    "Id": "-*",
+    "description": "Multiple Line Comment",
+    "type": "OpenMultiLineComment"
+  },
+  "*-": {
+    "Id": "*-",
+    "description": "Multple Line Comment",
+    "type": "ClosenMultiLineComment",
+    "regex": "^-\\*((.|\\n|\\s)*)\\*-$"
   }
 }
