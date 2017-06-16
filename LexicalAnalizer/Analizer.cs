@@ -29,7 +29,7 @@ namespace LexicalAnalizer
         {
             symbols = new SymbolHelper();
 
-            Symbol Delimiter = symbols.GetDelimiter();
+            Delimiter = symbols.GetDelimiter();
             AssigmentSymbols = symbols.GetSymbolsByType(TokenType.assigment);
             OAgrouper = symbols.GetSymbolsByType(TokenType.OpenGrouper);
             CAgrouper = symbols.GetSymbolsByType(TokenType.CloseGrouper);
@@ -53,7 +53,7 @@ namespace LexicalAnalizer
             while (CurrentLine != null)
             {
                 ProccessLine(CurrentLine, ref LineNumber);
-                
+
                 CurrentLine = FileToAnalize.ReadLine();
                 LineNumber++;
             }
@@ -61,9 +61,9 @@ namespace LexicalAnalizer
 
         private void ProccessLine(string CurrentLine, ref int LineNumber)
         {
-           
 
-            string[] LineStatements = CurrentLine.SplitAndKeepSeparators(new string[] { Delimiter.Id }).ToArray();
+
+            string[] LineStatements = CurrentLine.Trim().SplitAndKeepSeparators(new string[] { Delimiter.Id }).ToArray();
 
             foreach (string Statement in LineStatements)
             {
@@ -72,7 +72,7 @@ namespace LexicalAnalizer
                     LineNumber++;
                     continue;
                 }
-                    
+
                 string[] Words = CurrentLine.Split(AdditionalWordSpliter.ToArray(), StringSplitOptions.RemoveEmptyEntries);
                 foreach (string Word in Words)
                 {
@@ -89,7 +89,8 @@ namespace LexicalAnalizer
                                 break;
                             case TokenType.conditional:
                             case TokenType.loop:
-                                BlockStructure(ExistingToken, Statement, ref FileToAnalize, ref LineNumber, ref Scope);
+                                string CodeBlock = ExtractCodeBlock(Statement, ref LineNumber, ref FileToAnalize);
+                                BlockStructure(ExistingToken, CodeBlock, ref LineNumber, ref Scope);
                                 break;
                         }
 
@@ -125,21 +126,21 @@ namespace LexicalAnalizer
         {
             var RegexMatch = Token.Pattern.Match(Statement);
             string OperatorsPattern = symbols.GetSymbolSet(TokenType.arithmetic);
+            string ParenthesisPattern = symbols.GetSymbolSet(TokenType.OpenGrouper) + symbols.GetSymbolSet(TokenType.CloseGrouper);
             string AssigmentPattern = symbols.GetSymbolSet(TokenType.assigment);
 
-            var ArithmeticRegex = new Regex($"[{OperatorsPattern}]");
+            var ArithmeticRegex = new Regex($"[{OperatorsPattern}{ParenthesisPattern}]");
             var AssigmentRegex = new Regex($"[{AssigmentPattern}]");
 
             if (!RegexMatch.Success)
             {
                 //Determina si es una expresion libre de contexto
-                Match assigmentMatch = AssigmentRegex.Match(Statement);
+                Match assigmentMatch = ArithmeticRegex.Match(Statement);
 
                 if (assigmentMatch.Success)
                 {
-                    Match arithmetichMatch = AssigmentRegex.Match(Statement);
-                    if (arithmetichMatch.Success)
-                        return;
+
+                    return;
                 }
 
 
@@ -158,38 +159,149 @@ namespace LexicalAnalizer
             var Value = RegexMatch.Groups[TokenType.value.ToString()];
             if (Identifier != null)
             {
-                symbols.SetToken(new Symbol
+                Symbol ScopeExistingToken = symbols.GetTokenInPreviousScope(Identifier.Value, Scope);
+                if (ScopeExistingToken == null)
                 {
-                    Id = $"{Identifier.Value}-scope-{Scope}",
-                    IsCustom = true,
-                    name = Identifier.Value,
-                    DataType = Token,
-                    type = TokenType.identifier,
-                    Scope = Scope
-                });
+
+                    semanticValidation(Identifier.Value, Value.Value, Token, LineNumber);
+
+                    symbols.SetToken(new Symbol
+                    {
+                        Id = $"{Identifier.Value}-scope-{Scope}",
+                        IsCustom = true,
+                        name = Identifier.Value,
+                        DataType = Token,
+                        type = TokenType.identifier,
+                        Scope = Scope
+                    });
+
+
+                    if (Value != null)
+                    {
+                        symbols.SetToken(new Symbol
+                        {
+                            Id = $"{Identifier.Value}-scope-{Scope}_const",
+                            Value = Value.Value,
+                            IsCustom = true,
+                            type = TokenType.value
+                        });
+                    }
+                }
+                else
+                {
+                    symbols.AddError(new Error
+                    {
+                        Analizer = AnalizerType.lexical,
+                        Line = LineNumber,
+                        Message = $"The  identifier {Identifier.Value} was already defined before.",
+                        Type = "Sintax"
+                    });
+                }
+
             }
 
-            if (Value != null)
+        }
+
+        private void semanticValidation(string identifier, string value, Symbol token, int LineNumber)
+        {
+            if (token.Id.Equals("int",StringComparison.CurrentCultureIgnoreCase))
             {
-                symbols.SetToken(new Symbol
+                int val;
+                if (!int.TryParse(value, out val))
                 {
-                    Id = $"{Identifier.Value}_const",
-                    Value = Value.Value,
-                    IsCustom = true,
-                    type = TokenType.value
-                });
+                    symbols.AddError(new Error
+                    {
+                        Analizer = AnalizerType.semantic,
+                        Line = LineNumber,
+                        Message = $"The value {value} is not assignable to type {token.Id} in {identifier}"
+                    });
+
+                    
+                }
+                return;
+            }
+
+            if (token.Id.Equals("number", StringComparison.CurrentCultureIgnoreCase))
+            {
+                float val;
+                if (!float.TryParse(value, out val))
+                {
+                    symbols.AddError(new Error
+                    {
+                        Analizer = AnalizerType.semantic,
+                        Line = LineNumber,
+                        Message = $"The value {value} is not assignable to type {token.Id} in {identifier}"
+                    });
+
+                   
+                }
+
+                return;
+            }
+
+            if (token.Id.Equals("bool", StringComparison.CurrentCultureIgnoreCase))
+            {
+                bool val;
+                if (!bool.TryParse(value, out val))
+                {
+                    symbols.AddError(new Error
+                    {
+                        Analizer = AnalizerType.semantic,
+                        Line = LineNumber,
+                        Message = $"The value {value} is not assignable to type {token.Id} in {identifier}"
+                    });
+                    
+                }
+
+                return;
             }
         }
-        private void BlockStructure(Symbol Token, string Statement, ref StreamReader Reader, ref int LineNumber, ref int Scope)
+
+        private void BlockStructure(Symbol Token, string CodeBlock, ref int LineNumber, ref int Scope)
+        {
+
+
+            var match = Token.Pattern.Match(CodeBlock.ToString());
+            if (!match.Success)
+            {
+                symbols.AddError(new Error
+                {
+                    Analizer = AnalizerType.lexical,
+                    Line = LineNumber,
+                    Message = $"Error in {Token.Id} Sintax"
+                });
+            }
+            else
+            {
+                string body = match.Groups["body"].Value;
+                Scope++;
+                if (!string.IsNullOrEmpty(body) && body.Trim() != string.Empty)
+                {
+                    var BlockLines = body.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    LineNumber -= BlockLines.Count();
+                    foreach (string Line in BlockLines)
+                    {
+                        ProccessLine(Line, ref LineNumber);
+                    }
+
+                    Scope--;
+                }
+            }
+
+
+
+        }
+
+        private string ExtractCodeBlock(string Statement, ref int LineNumber, ref StreamReader Reader)
         {
             string OpenBlockDelimiter = symbols.GetSymbolSet(TokenType.OpenBlockDelimiter);
             string CloseBlockDelimiter = symbols.GetSymbolSet(TokenType.CloseBlockDelimiter);
             int OpenStatement = 0;
             int CloseStatement = 0;
-            string CodeBlock = "";
+            StringBuilder CodeBlock = new StringBuilder();
             while (Statement != null)
             {
-                CodeBlock += Statement;
+                CodeBlock.AppendLine(Statement);
                 if (Statement.IndexOf(OpenBlockDelimiter) > 0)
                 {
                     OpenStatement++;
@@ -203,45 +315,74 @@ namespace LexicalAnalizer
                 {
                     break;
                 }
-                
-
 
                 Statement = Reader.ReadLine();
-                LineNumber++;
+                if (Statement != null)
+                    LineNumber++;
             }
 
-            var match = Token.Pattern.Match(CodeBlock);
-            if (!match.Success)
-            {
-                symbols.AddError(new Error
-                {
-                    Analizer = AnalizerType.lexical,
-                    Line = LineNumber,
-                    Message = $"Error in {Token.Id} Sintax"
-                });
-            }
-            else {
-                string body = match.Groups["body"].Value;
-                Scope++;
-                if (!string.IsNullOrEmpty(body) && body.Trim() != string.Empty)
-                {
-                    var BlockLines = body.SplitAndKeepSeparators(new string[] { "\\n" });
-                    foreach(string Line in BlockLines)
-                    {
-                        ProccessLine(Line, ref LineNumber);
-                        LineNumber++;
-                    }
-                }
-            }
-
-
-
+            return CodeBlock.ToString();
         }
-        
 
-        public string SanitizeToken(string Token) {
-            return Regex.Replace(Token, @"[/\t/\s/\n]",string.Empty);
+
+        public string SanitizeToken(string Token)
+        {
+            return Regex.Replace(Token, @"[/\t/\s/\n]", string.Empty);
         }
+
+        //private void BuildSintaxTree(string Statement)
+        //{
+        //    string OperatorsPattern = symbols.GetSymbolSet(TokenType.arithmetic);
+        //    string ParenthesisPattern = symbols.GetSymbolSet(TokenType.OpenGrouper) + symbols.GetSymbolSet(TokenType.CloseGrouper);
+        //    string AssigmentPattern = symbols.GetSymbolSet(TokenType.assigment);
+
+        //    var ArithmeticRegex = new Regex($"[{OperatorsPattern}{ParenthesisPattern}{AssigmentPattern}]");
+        //    var AssigmentRegex = new Regex($"[{AssigmentPattern}]");
+        //    Match arithmetichMatch = AssigmentRegex.Match(Statement);
+        //    if (arithmetichMatch.Success)
+        //    {
+        //        var tokens = ArithmeticRegex.SplitIncludeSeparators(noSpacesStatement)?.ToList();
+        //        List<SintaxTree> sintaxTree = new List<SintaxTree>();
+        //        int startSintaxEvaluation = -1;
+        //        for (int i = 0; i < tokens?.Count(); i++)
+        //        {
+        //            if (i <= startSintaxEvaluation)
+        //                continue;
+        //            var token = tokens[i];
+
+        //            if (ArithmeticRegex.IsMatch(token))
+        //            {
+
+        //            }
+
+        //            if (startSintaxEvaluation == -1 && AssigmentRegex.IsMatch(token))
+        //            {
+        //                startSintaxEvaluation = i;
+        //            }
+        //        }
+
+        //    }
+        //    var whiteSpaceRegex = new Regex(" *");
+        //    string noSpacesStatement = whiteSpaceRegex.Replace(Statement, string.Empty);
+        //    sintaxTree.Add(new SintaxTree
+        //    {
+        //        Id = token
+        //    });
+
+        //    Regex OpenParenthesisRegex = new Regex(symbols.GetSymbolSet(TokenType.OpenGrouper));
+        //    Regex CloseParenthesisRegex = new Regex(symbols.GetSymbolSet(TokenType.CloseGrouper));
+
+        //    if (OpenParenthesisRegex.IsMatch(rightSide))
+        //    {
+        //        for (int i = currentIndex; i < tokens.Count(); i++)
+        //        {
+
+        //        }
+        //    }
+
+
+
+        //} 
 
         public void Dispose()
         {

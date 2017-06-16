@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+
 namespace LexicalAnalizer.Models
 {
     public static class Extensions
@@ -22,6 +24,21 @@ namespace LexicalAnalizer.Models
             {
                 yield return builder.ToString();
             }
+        }
+
+        public static IEnumerable<string> SplitIncludeSeparators(this Regex regex, string input)
+        {
+            var values = new List<string>();
+            int pos = 0;
+            foreach (Match m in regex.Matches(input))
+            {
+                values.Add(input.Substring(pos, m.Index - pos));
+                values.Add(m.Value);
+                pos = m.Index + m.Length;
+            }
+            values.Add(input.Substring(pos));
+
+            return values;
         }
     }
 }

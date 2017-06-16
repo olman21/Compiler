@@ -1,0 +1,5 @@
+C:\Olman\UAM\Modelos de programacion\Compiler\SintaxAnalizer\bin\Debug\SintaxAnalizer.dll
+C:\Olman\UAM\Modelos de programacion\Compiler\SintaxAnalizer\bin\Debug\SintaxAnalizer.pdb
+C:\Olman\UAM\Modelos de programacion\Compiler\SintaxAnalizer\obj\Debug\SintaxAnalizer.csprojResolveAssemblyReference.cache
+C:\Olman\UAM\Modelos de programacion\Compiler\SintaxAnalizer\obj\Debug\SintaxAnalizer.dll
+C:\Olman\UAM\Modelos de programacion\Compiler\SintaxAnalizer\obj\Debug\SintaxAnalizer.pdb

@@ -9,6 +9,7 @@ namespace Symbols.Models
     public enum AnalizerType
     {
         lexical,
-        sintax
+        sintax,
+        semantic
     }
 }

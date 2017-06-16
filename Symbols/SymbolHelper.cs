@@ -49,7 +49,7 @@ namespace Symbols
 
         public IEnumerable<Symbol> GetSymbolsByType(TokenType type) 
         {
-            return this.SymbolsTable.Where(s => s.Value != null ? s.Value.type == type : false)
+            return this.SymbolsTable.Where(s => s.Value != null && s.Value.type == type)
                         .Select(s=> s.Value);
         }
 
@@ -77,6 +77,10 @@ namespace Symbols
         public string GetSymbolSet(TokenType type)
         {
             return string.Join("", GetSymbolsByType(type).Select(o => o.escaped??o.Id).ToArray());
+        }
+
+        public Symbol GetTokenInPreviousScope(string Identifier, int ActualScope) {
+            return SymbolsTable.FirstOrDefault(s => s.Value?.name == Identifier && s.Value?.Scope <= ActualScope).Value;
         }
     }
 }

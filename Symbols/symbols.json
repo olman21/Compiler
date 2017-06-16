@@ -7,7 +7,7 @@
       "min": "-2147483648",
       "max": "2147483647"
     },
-    "regex": "int\\s+(?<identifier>(?!\\d)[a-zA-Z_0-9]{1,50})(\\s*=\\s*(?<value>(?<sign>-?)\\d{1,15}))?\\s*(?<delimiter>;)"
+    "regex": "int\\s+(?<identifier>(?!\\d)[a-zA-Z_0-9]{1,50})(\\s*=\\s*(?<value>(?<sign>-)?\\d{1,15}))?\\s*(?<delimiter>;)"
   },
   "number": {
     "Id": "number",
@@ -27,20 +27,20 @@
       "min": "-2147483648",
       "max": "2147483647"
     },
-    "regex": ""
+    "regex": "char\\s+(?<identifier>(?!\\d)[a-zA-Z_0-9]{1,50})(\\s*=\\s*(?<value>'.'))?\\s*(?<delimiter>;)"
   },
   "text": {
     "Id": "text",
     "description": "Characters string",
     "type": "primitive",
-    "regex": ""
+    "regex": "text\\s+(?<identifier>(?!\\d)[a-zA-Z_0-9]{1,50})(\\s*=\\s*(?<value>\".*\"))?\\s*(?<delimiter>;)"
   },
   "bool": {
     "Id": "bool",
     "description": "Boolean",
     "type": "primitive",
     "values": [ "true", "false", "0", "1" ],
-    "regex": ""
+    "regex": "bool\\s+(?<identifier>(?!\\d)[a-zA-Z_0-9]{1,50})(\\s*=\\s*(?<value>(true|false|0|1)))?\\s*(?<delimiter>;)"
   },
   "date": {
     "Id": "date",
@@ -137,7 +137,7 @@
     "Id": "if",
     "description": "flow",
     "type": "conditional",
-    "regex": "if\\s*\\(\\s*(((((?!\\\\d)[a-zA-Z_0-9]{1,50}))\\s*(equals|not=)\\s*[a-zA-Z0-9.\\d]+)|(((?!\\\\d)[a-zA-Z_0-9]{1,50})))\\s*\\)\\s*\\n?\\{(?<body>(.|\\n|(|)|{|}|\\s)*)\\}"
+    "regex": "if\\s*\\(\\s*(((((?!\\d)[a-zA-Z_0-9]{1,50}))\\s*(equals|not=)\\s*[a-zA-Z0-9.\\\\d]+)|(((?!\\d)[a-zA-Z_0-9]{1,50})))\\s*\\)\\s*\\n?\\{(?<body>(.|\\n|\\(|\\)|\\{|\\}|\\s)*)\\}"
   },
   "for": {
     "Id": "for",
